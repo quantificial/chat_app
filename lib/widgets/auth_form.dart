@@ -1,11 +1,16 @@
 import 'package:firebase_app/l10n/s.dart';
+import 'package:firebase_app/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AuthForm extends StatefulWidget {
   const AuthForm({
     super.key,
+    required this.submitAuthForm,
   });
+
+  final void Function(
+          String email, String password, String username, bool isLogin)
+      submitAuthForm;
 
   @override
   State<AuthForm> createState() => _AuthFormState();
@@ -13,6 +18,15 @@ class AuthForm extends StatefulWidget {
 
 class _AuthFormState extends State<AuthForm> {
   final _formKey = GlobalKey<FormState>();
+
+  bool _isLogin = true;
+  bool _isLoading = false;
+
+  String lang = 'en';
+
+  String _userEmail = '';
+  String _userName = '';
+  String _userPassword = '';
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +41,7 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 // text fields and decoration
                 TextFormField(
+                  key: const ValueKey('email'),
                   validator: (value) {
                     if (value!.isEmpty || !value.contains('@')) {
                       return S.of(context)!.enter_valid_email_address;
@@ -35,27 +50,81 @@ class _AuthFormState extends State<AuthForm> {
                   },
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(labelText: 'Email Address'),
+                  onSaved: (newValue) => _userEmail = newValue!,
                 ),
+                if (!_isLogin)
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'Username'),
+                    key: const ValueKey('username'),
+                    validator: (value) {
+                      if (value!.length < 4) {
+                        return 'invalid username';
+                      }
+
+                      return null;
+                    },
+                    onSaved: (newValue) => _userName = newValue!,
+                  ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Username'),
-                ),
-                TextFormField(
+                  key: const ValueKey('password'),
                   decoration: InputDecoration(labelText: 'Password'),
                   obscureText: true,
+                  validator: (value) {
+                    if (value!.isEmpty || value!.length < 7) {
+                      return 'password invalid';
+                    }
+                    return null;
+                  },
+                  onSaved: (newValue) => _userPassword = newValue!,
                 ),
                 SizedBox(
                   height: 12,
                 ),
-                OutlinedButton.icon(
-                    onPressed: () {
-                      _formKey.currentState!.validate();
-                    },
-                    icon: Icon(Icons.rectangle),
-                    label: Text('Login')),
+                if (_isLoading) CircularProgressIndicator(),
+                if (!_isLoading)
+                  OutlinedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        // Validation ////////////////////////////////////
+                        final isValid = _formKey.currentState!.validate();
+
+                        FocusScope.of(context).unfocus();
+
+                        // Save /////////////////////////////////////////
+                        if (isValid) {
+                          _formKey.currentState!.save();
+                          widget.submitAuthForm(
+                              _userEmail, _userPassword, _userName, _isLogin);
+                          // print(_userEmail);
+                          // print(_userName);
+                          // print(_userPassword);
+                          //Future.delayed(Duration(seconds: 5));
+                        }
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
+                      icon: Icon(Icons.rectangle),
+                      label: Text('Login')),
                 TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _isLogin = !_isLogin;
+                      });
+                    },
                     icon: Icon(Icons.person),
-                    label: Text('New Account'))
+                    label: Text(_isLogin
+                        ? 'Create New Account'
+                        : 'I already have an account')),
+                TextButton.icon(
+                    onPressed: () {
+                      lang = lang == 'en' ? 'zh' : 'en';
+                      MyApp.setLocale(context, Locale(lang));
+                    },
+                    icon: Icon(Icons.language),
+                    label: Text('Switch Language'))
               ]),
             ),
           )),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app/screens/auth_screen.dart';
 import 'package:firebase_app/screens/chat_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -12,6 +13,7 @@ bool shouldUseFirestoreEmulator = false;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Connected To Firebase /////////////////////////////////////////////////////
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   if (shouldUseFirestoreEmulator) {
@@ -21,8 +23,26 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  static Future<void> setLocale(BuildContext context, Locale newLocale) async {
+    _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    state?.changeLanguage(newLocale);
+  }
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale _locale = Locale('en');
+
+  changeLanguage(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
 
   // This widget is the root of your application.
   @override
@@ -31,14 +51,13 @@ class MyApp extends StatelessWidget {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         title: 'Flutter Chat',
-        locale: Locale('zh'),
+        locale: _locale,
         theme: ThemeData(
             primarySwatch: Colors.indigo,
             colorScheme: ColorScheme.fromSwatch(
-                primarySwatch: Colors.deepPurple,
-                accentColor: Colors.orange,
-                backgroundColor: Colors.pink),
-            scaffoldBackgroundColor: Colors.pink,
+              primarySwatch: Colors.deepPurple,
+              accentColor: Colors.orange,
+            ),
             buttonTheme: ButtonTheme.of(context).copyWith(
                 buttonColor: Colors.pink, textTheme: ButtonTextTheme.primary)),
         // home: Container(
@@ -47,6 +66,16 @@ class MyApp extends StatelessWidget {
         //       locale: const Locale('en'),
         //       child: AuthScreen()),
         // ));
-        home: AuthScreen());
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              print('username: ${snapshot.data!.displayName}');
+              return ChatScreen();
+            } else {
+              return AuthScreen();
+            }
+          },
+        ));
   }
 }
