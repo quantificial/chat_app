@@ -28,7 +28,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         title: 'Flutter Chat',
+        locale: Locale('zh'),
         theme: ThemeData(
             primarySwatch: Colors.indigo,
             colorScheme: ColorScheme.fromSwatch(
@@ -38,6 +41,12 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: Colors.pink,
             buttonTheme: ButtonTheme.of(context).copyWith(
                 buttonColor: Colors.pink, textTheme: ButtonTextTheme.primary)),
+        // home: Container(
+        //   child: Localizations.override(
+        //       context: context,
+        //       locale: const Locale('en'),
+        //       child: AuthScreen()),
+        // ));
         home: AuthScreen());
   }
 }

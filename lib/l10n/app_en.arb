@@ -4,5 +4,11 @@
   "hello_world": "Hello World!",
   "@hello_world": {
     "description": "The conventional newborn programmer greeting"
+  },
+
+  "enter_valid_email_address" : "please enter a valid email address.",
+  "@enter_valid_email_address" : {
+    "description" : ""
   }
+
 }

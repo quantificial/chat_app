@@ -1,4 +1,6 @@
+import 'package:firebase_app/l10n/s.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AuthForm extends StatefulWidget {
   const AuthForm({
@@ -27,7 +29,7 @@ class _AuthFormState extends State<AuthForm> {
                 TextFormField(
                   validator: (value) {
                     if (value!.isEmpty || !value.contains('@')) {
-                      return 'please enter a valid email address';
+                      return S.of(context)!.enter_valid_email_address;
                     }
                     return null;
                   },
