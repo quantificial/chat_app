@@ -51,16 +51,20 @@ class _AuthScreenState extends State<AuthScreen> {
 
         print(url);
 
+        var data = {
+          'image_url': url,
+          'username': username,
+          'email': user.email,
+          'test': 'abc',
+        };
+        print('-------');
+        print(data);
+
         // Update Users Collection ////////////////////////////////////////////
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user!.uid)
-            .set({
-          'username': username,
-          'email': user.email,
-          'test': 'abc',
-          'image_url': url
-        });
+            .set(data);
       } catch (e) {
         print(e.toString());
       }
