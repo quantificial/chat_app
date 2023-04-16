@@ -3,6 +3,8 @@
 
   "hello_world": "你好，世界",
 
-  "enter_valid_email_address" : "請輸入正確電郵地址"
+  "enter_valid_email_address" : "請輸入正確電郵地址",
+
+  "email_address" : "電子郵件"
 
 }

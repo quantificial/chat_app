@@ -49,7 +49,8 @@ class _AuthFormState extends State<AuthForm> {
                     return null;
                   },
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(labelText: 'Email Address'),
+                  decoration:
+                      InputDecoration(labelText: S.of(context)!.email_address),
                   onSaved: (newValue) => _userEmail = newValue!,
                 ),
                 if (!_isLogin)
