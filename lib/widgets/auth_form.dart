@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:firebase_app/l10n/s.dart';
 import 'package:firebase_app/main.dart';
+import 'package:firebase_app/widgets/pickers/user_image_picker.dart';
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
@@ -8,9 +11,8 @@ class AuthForm extends StatefulWidget {
     required this.submitAuthForm,
   });
 
-  final void Function(
-          String email, String password, String username, bool isLogin)
-      submitAuthForm;
+  final void Function(String email, String password, String username,
+      File? image, bool isLogin) submitAuthForm;
 
   @override
   State<AuthForm> createState() => _AuthFormState();
@@ -28,6 +30,12 @@ class _AuthFormState extends State<AuthForm> {
   String _userName = '';
   String _userPassword = '';
 
+  File? _userImageFile;
+
+  void _pickImage(File image) {
+    _userImageFile = image;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -39,6 +47,8 @@ class _AuthFormState extends State<AuthForm> {
               key: _formKey,
               // flutter form
               child: Column(mainAxisSize: MainAxisSize.min, children: [
+                if (!_isLogin) UserImagePicker(imagePickFn: _pickImage),
+
                 // text fields and decoration
                 TextFormField(
                   key: const ValueKey('email'),
@@ -90,14 +100,24 @@ class _AuthFormState extends State<AuthForm> {
                         });
                         // Validation ////////////////////////////////////
                         final isValid = _formKey.currentState!.validate();
-
                         FocusScope.of(context).unfocus();
+
+                        if (_userImageFile == null && !_isLogin) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Please pick an image')));
+
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          return;
+                        }
 
                         // Save /////////////////////////////////////////
                         if (isValid) {
                           _formKey.currentState!.save();
-                          widget.submitAuthForm(
-                              _userEmail, _userPassword, _userName, _isLogin);
+                          widget.submitAuthForm(_userEmail, _userPassword,
+                              _userName, _userImageFile, _isLogin);
                           // print(_userEmail);
                           // print(_userName);
                           // print(_userPassword);
