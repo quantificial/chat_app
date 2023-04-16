@@ -3,6 +3,7 @@ import 'package:firebase_app/screens/auth_screen.dart';
 import 'package:firebase_app/screens/chat_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -15,6 +16,13 @@ Future<void> main() async {
 
   // Connected To Firebase /////////////////////////////////////////////////////
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print(fcmToken);
+
+  FirebaseMessaging.onMessage.listen((event) {
+    print('msg: ${event}');
+  });
 
   if (shouldUseFirestoreEmulator) {
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);

@@ -81,7 +81,7 @@ class _AuthFormState extends State<AuthForm> {
                   decoration: InputDecoration(labelText: 'Password'),
                   obscureText: true,
                   validator: (value) {
-                    if (value!.isEmpty || value!.length < 7) {
+                    if (value!.isEmpty || value.length < 7) {
                       return 'password invalid';
                     }
                     return null;

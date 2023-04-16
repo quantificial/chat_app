@@ -63,7 +63,7 @@ class _AuthScreenState extends State<AuthScreen> {
         // Update Users Collection ////////////////////////////////////////////
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(user!.uid)
+            .doc(user.uid)
             .set(data);
       } catch (e) {
         print(e.toString());
